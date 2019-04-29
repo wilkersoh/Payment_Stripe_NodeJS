@@ -2,6 +2,12 @@
 #### env功能
 #### ejs 复习
 
+
+#### Stripe  - Payment
+<p>stripePublicKey从后端利用render</p>
+
+
+
 #### env功能
 <p>放一些TOKEN和比较机密的东西</p>
 

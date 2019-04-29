@@ -1,0 +1,20 @@
+{
+  "name": "Payment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "stripe": "^6.31.1"
+  },
+  "devDependencies": {
+    "dotenv": "^7.0.0"
+  }
+}

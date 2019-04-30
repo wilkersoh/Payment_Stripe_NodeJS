@@ -28,23 +28,58 @@ function ready() {
 
 let stripeHandler = StripeCheckout.configure({
     key: stripePublicKey,
-    locale: 'auto',
+    auto: 'en',
     token: function(token){
-
+        console.log(token)
+        let items = [];
+        // 买的资料，不如哪样东西 多少个
+        let cartItemContainer = document.getElementsByClassName('cart-items')[0];
+        let cartRows = cartItemContainer.getElementsByClassName('cart-row');
+        for( let i = 0; i < cartRows.length; i++){
+            let cartRow = cartRows[i];
+            // 要多少item个的tag
+            let quantityElement = cartRow.getElementsByClassName('cart-quantity-input')[0];
+            let quantity = quantityElement.value;
+            let id = cartRow.dataset.itemId;
+            items.push({
+                id,
+                quantity,
+            })
+        }
+        // send the token to server!! using fetch
+        fetch('/purchase', {
+            // send to server
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                // 把上面收集到的资料 post去 server
+                stripeTokenId: token.id,
+                items,
+            })
+        }).then((res) => {
+            return res.json()
+        }).then(data => {
+            alert(data.message);
+            var cartItems = document.getElementsByClassName('cart-items')[0]
+            while (cartItems.hasChildNodes()) {
+                cartItems.removeChild(cartItems.firstChild)
+            }
+            updateCartTotal()
+        }).catch(err => {
+            console.log(error(error));
+        })
     }
 })
 
 function purchaseClicked() {
     // alert('Thank you for your purchase')
-    // var cartItems = document.getElementsByClassName('cart-items')[0]
-    // while (cartItems.hasChildNodes()) {
-    //     cartItems.removeChild(cartItems.firstChild)
-    // }
-    // updateCartTotal()
     let priceElement = document.getElementsByClassName('cart-total-price')[0];
     let price = parseFloat(priceElement.innerText.replace('$', '')) * 100;  
     stripeHandler.open({
-        amout: price
+        amount: price
     })
 }
 
@@ -68,13 +103,15 @@ function addToCartClicked(event) {
     var title = shopItem.getElementsByClassName('shop-item-title')[0].innerText
     var price = shopItem.getElementsByClassName('shop-item-price')[0].innerText
     var imageSrc = shopItem.getElementsByClassName('shop-item-image')[0].src
-    addItemToCart(title, price, imageSrc)
+    var id = shopItem.dataset.itemId
+    addItemToCart(title, price, imageSrc, id)
     updateCartTotal()
 }
 
-function addItemToCart(title, price, imageSrc) {
+function addItemToCart(title, price, imageSrc, id) {
     var cartRow = document.createElement('div')
-    cartRow.classList.add('cart-row')
+    cartRow.classList.add('cart-row');
+    cartRow.dataset.itemId = id;
     var cartItems = document.getElementsByClassName('cart-items')[0]
     var cartItemNames = cartItems.getElementsByClassName('cart-item-title')
     for (var i = 0; i < cartItemNames.length; i++) {
